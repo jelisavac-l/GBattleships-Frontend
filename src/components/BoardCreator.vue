@@ -91,6 +91,23 @@ function clearBoard() {
   shipTypes[3].count = 2;
 }
 
+function printBoardMatrix(board) {
+  board.forEach(row => {
+    // E = empty, S = ship, H = hit, M = miss
+    const rowStr = row.map(cell => {
+      switch (cell.status) {
+        case "ship": return "S";
+        case "hit": return "H";
+        case "miss": return "M";
+        case "empty": 
+        default: return "E";
+      }
+    }).join(" ");
+    console.log(rowStr);
+  });
+}
+
+
 const allShipsPlaced = computed(() => shipTypes.every((s) => s.count === 0));
 
 function submitBoard() {
@@ -98,7 +115,7 @@ function submitBoard() {
     alert("You must place all ships first!");
     return;
   }
-  console.log("Submitting board:", board.value);
+  console.log("Submitting board:\n", printBoardMatrix(board.value));
 }
 
 function handleKeydown(e) {
