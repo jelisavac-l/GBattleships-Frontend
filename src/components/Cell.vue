@@ -4,11 +4,13 @@
       :class="cellClass"
       :data-x="x"
       :data-y="y"
+      @click="$emit('click', { x, y })"
     ></div>
+    
   </template>
   
   <script setup>
-  import { defineProps, computed } from 'vue'
+  import { computed } from 'vue'
   
   const props = defineProps({
     status: String,

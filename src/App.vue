@@ -1,22 +1,28 @@
 <template>
   <div id="app">
     <template v-if="currentPage === 'home'">
-      <Home @join-clicked="showGame" @host-clicked="showGame" />
+      <!-- <Home @join-clicked="showGame" @host-clicked="showGame" /> -->
+       <BoardCreator />
     </template>
     <template v-else-if="currentPage === 'game'">
       <Game />
     </template>
+    <template v-else-if="currentPage === 'setup'">
+      <BoardCreator />
+    </template>
   </div>
-</template>c
+</template>
 
 <script setup>
 import Game from './components/Game.vue'
+import BoardCreator from './components/BoardCreator.vue';
 import Home from './components/home/Home.vue';
 import {ref} from 'vue';
 
+
 const currentPage = ref('home');
 const showGame = () => {
-  currentPage.value = 'game';
+  currentPage.value = 'setup';
 };
 </script>
 

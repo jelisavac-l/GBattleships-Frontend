@@ -1,13 +1,13 @@
 <template>
     <div class="grid">
       <Cell
-        v-for="(cell, index) in flatBoard"
-        :key="index"
-        :status="cell.status"
-        :x="index % gridSize"
-        :y="Math.floor(index / gridSize)"
-        :isEnemy="isEnemy"
-        @click="onCellClick"
+          v-for="(cell, index) in flatBoard"
+          :key="index"
+          :status="cell.status"
+          :x="index % gridSize"
+          :y="Math.floor(index / gridSize)"
+          :isEnemy="isEnemy"
+          @click="onCellClick"
       />
     </div>
   </template>
@@ -15,7 +15,6 @@
   <script setup>
   import { computed } from 'vue'
   import Cell from './Cell.vue'
-  import { defineProps, defineEmits } from 'vue'
   
   const props = defineProps({
     board: Array,
@@ -28,9 +27,8 @@
   
   const flatBoard = computed(() => props.board.flat())
   
-  function onCellClick(event) {
-    const { x, y } = event.target.dataset
-    emit('cell-clicked', { x: Number(x), y: Number(y) })
+  function onCellClick({ x, y }) {
+    emit('cell-clicked', { x, y })
   }
   </script>
   
