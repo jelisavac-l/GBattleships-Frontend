@@ -29,7 +29,7 @@ const shipTypes = reactive([
   { name: "Carrier", length: 5, count: 1 },
   { name: "Battleship", length: 4, count: 1 },
   { name: "Cruiser", length: 3, count: 2 },
-  { name: "Destroyer", length: 2, count: 2 },
+  { name: "Destroyer", length: 2, count: 1 },
 ]);
 
 const orientation = ref("horizontal");
@@ -93,14 +93,14 @@ function clearBoard() {
 
 function printBoardMatrix(board) {
   board.forEach(row => {
-    // E = empty, S = ship, H = hit, M = miss
+    // 0 = empty, 1 = ship, 2 = hit, 3 = miss
     const rowStr = row.map(cell => {
       switch (cell.status) {
-        case "ship": return "S";
-        case "hit": return "H";
-        case "miss": return "M";
-        case "empty": 
-        default: return "E";
+        case "ship": return 1;
+        case "hit": return 2;
+        case "miss": return 3;
+        case "empty": return 0; 
+        default: return 0;
       }
     }).join(" ");
     console.log(rowStr);
