@@ -14,7 +14,14 @@
   <script setup>
   import { ref } from 'vue'
   import Grid from './Grid.vue'
-  
+
+  const props = defineProps({
+    board: {
+      type: Array,
+      required: true,
+    },
+  })
+
   const gridSize = 10
   
   // Initialize empty 10x10 boards
@@ -25,14 +32,15 @@
       }))
     )
   
-  const playerBoard = ref(createEmptyBoard())
+    // I want to assign this board throgh props
+  const playerBoard = ref(props.board)
   const enemyBoard = ref(createEmptyBoard())
   
   function handleCellClick({ x, y }) {
     console.log('Clicked your cell:', x, y)
-    // For testing: toggle a ship
-    const cell = playerBoard.value[y][x]
-    cell.status = cell.status === 'ship' ? 'empty' : 'ship'
+    // // For testing: toggle a ship
+    // const cell = playerBoard.value[y][x]
+    // cell.status = cell.status === 'ship' ? 'empty' : 'ship'
   }
   
   function handleEnemyCellClick({ x, y }) {

@@ -5,7 +5,7 @@
       <Home @join-clicked="joinGame" @host-clicked="createGame" />
     </template>
     <template v-else-if="currentPage === 'game'">
-      <Game />
+      <Game :board=currentBoard />
     </template>
     <template v-else-if="currentPage === 'created'">
       <Status :id=currentGameID />
@@ -30,6 +30,7 @@ const ws = ref(null);
 const currentGameID = ref(null);
 const gameData = ref(null);
 const error = ref(null);
+const currentBoard = ref(null)
 
 const generateRandomUsername = () => {
   const adjectives = ['Cool', 'Brave', 'Smart', 'Quick', 'Sassy', 'Gentle', 'Funny'];
@@ -155,12 +156,17 @@ const handleWebSocketRequest = (event) => {
         console.log('Requesting board...');
         showSetup()
         break;
+      case 'gameStartedMessage':
+        showGame()
       default:
         break;
     }
 };
 
 const submitBoard = (board) => {
+
+  currentBoard.value = board;
+
   if (!ws.value || ws.value.readyState !== WebSocket.OPEN) {
     console.error("Cannot send message: WebSocket is not connected or ready.");
     return;
@@ -177,6 +183,9 @@ const submitBoard = (board) => {
   })
 
   );
+
+  
+
   const transferObject = {
     Type: "SendBoardMessage",
     Payload: {
