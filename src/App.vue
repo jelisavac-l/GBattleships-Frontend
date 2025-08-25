@@ -2,7 +2,7 @@
   <div id="app">
     <template v-if="currentPage === 'home'">
       <!-- <Home @join-clicked="showGame" @host-clicked="showGame" /> -->
-       <Home @join-clicked="showGame" @host-clicked="createGame"/>
+      <Home @join-clicked="joinGame" @host-clicked="createGame" />
     </template>
     <template v-else-if="currentPage === 'game'">
       <Game />
@@ -20,9 +20,10 @@
 import Game from './components/Game.vue'
 import BoardCreator from './components/BoardCreator.vue';
 import Home from './components/home/Home.vue';
-import {ref} from 'vue';
+import { ref } from 'vue';
 import Status from './components/Status.vue';
 
+const server = 'localhost:8080';
 
 const currentPage = ref('home');
 const ws = ref(null);
@@ -58,7 +59,7 @@ const createGame = async () => {
 
   // 2. Send the POST request using fetch
   try {
-    const response = await fetch('http://localhost:8080/game', {
+    const response = await fetch(`http://${server}/game`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -74,13 +75,13 @@ const createGame = async () => {
     const data = await response.json();
     gameData.value = data;
 
-    if (data && data.gid ) {
+    if (data && data.gid) {
       currentGameID.value = data.gid;
       console.log('Successfully created game with GID:', data.gid);
 
       // Websocket
       console.log('Attempting to establish websocket connection...')
-      const wsUrl = `ws://localhost:8080/${currentGameID.value}/player1?id=${requestBody.username}&username=${username}`;
+      const wsUrl = `ws://${server}/${currentGameID.value}/player1?id=${requestBody.username}&username=${username}`;
       ws.value = new WebSocket(wsUrl);
 
       // Listeners
@@ -105,7 +106,7 @@ const createGame = async () => {
     }
 
     currentPage.value = 'created'
-    
+
   } catch (err) {
     // 4. Catch and handle any network or HTTP errors
     error.value = 'Failed to create game. Please check the server connection.';
@@ -114,6 +115,36 @@ const createGame = async () => {
 
 
 };
+
+const joinGame = (gid) => {
+
+  const gameId = Math.floor(Math.random() * 100000).toString(); // A random integer for the ID
+  const username = generateRandomUsername(); // A random username
+  const requestBody = {
+    id: gameId,
+    username: username
+  };
+  const wsUrl = `ws://${server}/${gid}/player2?id=${requestBody.username}&username=${username}`;
+  ws.value = new WebSocket(wsUrl);
+
+  // Listeners
+  ws.value.onopen = (event) => {
+    console.log('WebSocket connection opened!', event);
+  };
+
+  ws.value.onmessage = (event) => {
+    console.log('Received message:', event.data);
+    // TODO: Add message logic
+  };
+
+  ws.value.onclose = (event) => {
+    console.log('WebSocket connection closed.', event);
+  };
+
+  ws.value.onerror = (error) => {
+    console.error('WebSocket error:', error);
+  };
+}
 
 const showGame = () => {
   currentPage.value = 'game';
@@ -131,15 +162,15 @@ const showGameCreated = () => {
 
 <style scoped>
 @font-face {
-    font-family: Minecraft;
-    src: url('./assets/fonts/MinecraftRegular-Bmg3.otf');
-    font-weight: 500;
+  font-family: Minecraft;
+  src: url('./assets/fonts/MinecraftRegular-Bmg3.otf');
+  font-weight: 500;
 }
 
 @font-face {
-    font-family: Minecraft;
-    src: url('./assets/fonts/MinecraftBold-nMK1.otf');
-    font-weight: bold;
+  font-family: Minecraft;
+  src: url('./assets/fonts/MinecraftBold-nMK1.otf');
+  font-weight: bold;
 }
 
 #app {
