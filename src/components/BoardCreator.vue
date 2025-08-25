@@ -13,7 +13,6 @@
       <button @click="submitBoard" :disabled="!allShipsPlaced">Submit</button>
     </div>
 
-    <!-- Here the error happens -->
     <Grid :board="board" :isEnemy="false" @cell-clicked="placeShip" />
     <p>Press <b>R</b> to rotate (current: {{ orientation }})</p>
   </div>
@@ -22,7 +21,6 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from "vue";
 import Grid from "./Grid.vue";
-console.log("BoardCreator mounted");
 const gridSize = 10;
 
 const shipTypes = reactive([
@@ -31,6 +29,8 @@ const shipTypes = reactive([
   { name: "Cruiser", length: 3, count: 2 },
   { name: "Destroyer", length: 2, count: 1 },
 ]);
+
+const emit = defineEmits(['submit-board'])
 
 const orientation = ref("horizontal");
 const selectedShip = ref(null);
@@ -116,6 +116,7 @@ function submitBoard() {
     return;
   }
   console.log("Submitting board:\n", printBoardMatrix(board.value));
+  emit('submit-board', board.value)
 }
 
 function handleKeydown(e) {

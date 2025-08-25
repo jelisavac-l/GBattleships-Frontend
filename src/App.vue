@@ -11,7 +11,7 @@
       <Status :id=currentGameID />
     </template>
     <template v-else-if="currentPage === 'setup'">
-      <BoardCreator />
+      <BoardCreator @submit-board="submitBoard"/>
     </template>
   </div>
 </template>
@@ -90,8 +90,7 @@ const createGame = async () => {
       };
 
       ws.value.onmessage = (event) => {
-        console.log('Received message:', event.data);
-        // TODO: Add message logic
+        handleWebSocketRequest(event)
       };
 
       ws.value.onclose = (event) => {
@@ -133,7 +132,7 @@ const joinGame = (gid) => {
   };
 
   ws.value.onmessage = (event) => {
-    console.log('Received message:', event.data);
+    handleWebSocketRequest(event)
     // TODO: Add message logic
   };
 
@@ -144,6 +143,53 @@ const joinGame = (gid) => {
   ws.value.onerror = (error) => {
     console.error('WebSocket error:', error);
   };
+}
+
+// Handling websocket messages
+const handleWebSocketRequest = (event) => {
+
+  const messageType = JSON.parse(event.data).type.toString()
+    console.log(messageType)
+    switch (messageType) {
+      case 'GetBoardMessage':
+        console.log('Requesting board...');
+        showSetup()
+        break;
+      default:
+        break;
+    }
+};
+
+const submitBoard = (board) => {
+  if (!ws.value || ws.value.readyState !== WebSocket.OPEN) {
+    console.error("Cannot send message: WebSocket is not connected or ready.");
+    return;
+  }
+  // Create numeric board
+  const numericBoard = board.map((row) => row.map((cell) => {
+      switch (cell.status) {
+        case "ship": return 1;
+        case "hit": return 2;
+        case "miss": return 3;
+        case "empty": return 0; 
+        default: return 0;
+      }
+  })
+
+  );
+  const transferObject = {
+    Type: "SendBoardMessage",
+    Payload: {
+      Cells: numericBoard
+    }
+  }
+
+  const jsonString = JSON.stringify(transferObject);
+  console.log(jsonString);
+
+  // Send json here
+  ws.value.send(jsonString)
+
 }
 
 const showGame = () => {
