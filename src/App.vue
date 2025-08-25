@@ -25,7 +25,8 @@ import Status from './components/Status.vue';
 
 
 const currentPage = ref('home');
-const currentGameID = ref(null)
+const ws = ref(null);
+const currentGameID = ref(null);
 const gameData = ref(null);
 const error = ref(null);
 
@@ -67,7 +68,6 @@ const createGame = async () => {
 
     // 3. Handle the response
     if (!response.ok) {
-      // If the response is not OK (e.g., 404, 500), throw an error
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
@@ -77,6 +77,29 @@ const createGame = async () => {
     if (data && data.gid ) {
       currentGameID.value = data.gid;
       console.log('Successfully created game with GID:', data.gid);
+
+      // Websocket
+      console.log('Attempting to establish websocket connection...')
+      const wsUrl = `ws://localhost:8080/${currentGameID.value}/player1?id=${requestBody.username}&username=${username}`;
+      ws.value = new WebSocket(wsUrl);
+
+      // Listeners
+      ws.value.onopen = (event) => {
+        console.log('WebSocket connection opened!', event);
+      };
+
+      ws.value.onmessage = (event) => {
+        console.log('Received message:', event.data);
+        // TODO: Add message logic
+      };
+
+      ws.value.onclose = (event) => {
+        console.log('WebSocket connection closed.', event);
+      };
+
+      ws.value.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
     } else {
       console.error('Response did not contain a GID.');
     }
