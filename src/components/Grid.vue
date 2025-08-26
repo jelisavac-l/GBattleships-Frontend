@@ -28,6 +28,10 @@
   const flatBoard = computed(() => props.board.flat())
   
   function onCellClick({ x, y }) {
+    // There is this weird bug that i should address later,
+    // for now this DRZI VODU
+    if(x > gridSize | y > gridSize) return
+    
     emit('cell-clicked', { x, y })
   }
   </script>

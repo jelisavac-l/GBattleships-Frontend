@@ -88,7 +88,7 @@ function clearBoard() {
   shipTypes[0].count = 1;
   shipTypes[1].count = 1;
   shipTypes[2].count = 2;
-  shipTypes[3].count = 2;
+  shipTypes[3].count = 1;
 }
 
 function printBoardMatrix(board) {

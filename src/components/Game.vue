@@ -9,15 +9,25 @@
       <Grid :board="enemyBoard" :isEnemy="true" @cell-clicked="handleEnemyCellClick" />
       </div>
     </div>
+    <div class="info">
+      <p v-if=yourTurn><span style="color: green;">Your</span> turn.</p>
+      <p v-else><span style="color: red;">Opponent's</span> turn.</p>
+    </div>
   </template>
   
   <script setup>
   import { ref } from 'vue'
   import Grid from './Grid.vue'
 
+  const emit = defineEmits(['move'])
+
   const props = defineProps({
     board: {
       type: Array,
+      required: true,
+    },
+    yourTurn: {
+      type: Boolean,
       required: true,
     },
   })
@@ -32,25 +42,20 @@
       }))
     )
   
-    // I want to assign this board throgh props
   const playerBoard = ref(props.board)
   const enemyBoard = ref(createEmptyBoard())
   
   function handleCellClick({ x, y }) {
     console.log('Clicked your cell:', x, y)
-    // // For testing: toggle a ship
-    // const cell = playerBoard.value[y][x]
-    // cell.status = cell.status === 'ship' ? 'empty' : 'ship'
   }
   
   function handleEnemyCellClick({ x, y }) {
     console.log('Attack enemy cell:', x, y)
-    const cell = enemyBoard.value[y][x]
-    if (cell.status === 'empty') {
-      cell.status = 'miss'
-    } else if (cell.status === 'ship') {
-      cell.status = 'hit'
+    if(props.yourTurn) {
+      // Only now the move should be handled
+      emit('move', { x, y })
     }
+    
   }
   </script>
   
@@ -60,6 +65,11 @@
     justify-content: space-around;
     margin-top: 20px;
     gap: 20rem;
+  }
+
+  .info {
+    margin-top: 3em;
+    font-size: larger;
   }
   </style>
   

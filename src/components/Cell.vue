@@ -32,7 +32,7 @@
     width: 30px;
     height: 30px;
     background-color: lightblue;
-    border: 1px solid #444;
+    border: 1px solid #3a3a3a;
     cursor: pointer;
   }
   

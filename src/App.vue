@@ -5,7 +5,7 @@
       <Home @join-clicked="joinGame" @host-clicked="createGame" />
     </template>
     <template v-else-if="currentPage === 'game'">
-      <Game :board=currentBoard />
+      <Game :board=currentBoard @move="sendMove" :your-turn=yourTurn />
     </template>
     <template v-else-if="currentPage === 'created'">
       <Status :id=currentGameID />
@@ -31,6 +31,7 @@ const currentGameID = ref(null);
 const gameData = ref(null);
 const error = ref(null);
 const currentBoard = ref(null)
+const yourTurn = ref(false)
 
 const generateRandomUsername = () => {
   const adjectives = ['Cool', 'Brave', 'Smart', 'Quick', 'Sassy', 'Gentle', 'Funny'];
@@ -158,6 +159,10 @@ const handleWebSocketRequest = (event) => {
         break;
       case 'gameStartedMessage':
         showGame()
+        break;
+      case 'GetTurnMessage':
+        yourTurn.value = true
+      break;
       default:
         break;
     }
@@ -184,8 +189,6 @@ const submitBoard = (board) => {
 
   );
 
-  
-
   const transferObject = {
     Type: "SendBoardMessage",
     Payload: {
@@ -199,6 +202,29 @@ const submitBoard = (board) => {
   // Send json here
   ws.value.send(jsonString)
 
+}
+
+function sendMove({ x, y }) {
+  
+  yourTurn.value = false;
+  
+  // Check if the WebSocket connection is open
+  if (!ws || ws.value.readyState !== WebSocket.OPEN) {
+    console.error("WebSocket is not connected. Cannot send turn message.");
+    return;
+  }
+
+  const turnMessage = {
+    Type: "SendTurnMessage",
+    Payload: {
+      x: x,
+      y: y,
+    },
+  };
+
+  const jsonString = JSON.stringify(turnMessage);
+  console.log("Sending turn:", jsonString);
+  ws.value.send(jsonString);
 }
 
 const showGame = () => {
