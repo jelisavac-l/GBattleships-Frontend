@@ -16,7 +16,7 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
   import Grid from './Grid.vue'
 
   const emit = defineEmits(['move'])
@@ -30,6 +30,8 @@
       type: Boolean,
       required: true,
     },
+    lastTurn: Array,  // 
+    enemyTurn: Array
   })
 
   const gridSize = 10
@@ -55,8 +57,21 @@
       // Only now the move should be handled
       emit('move', { x, y })
     }
-    
   }
+
+  const handleLastTurnChange = (newLastTurn, oldLastTurn) => {
+    if(newLastTurn === null || oldLastTurn === null) return;
+    const x = newLastTurn[0]
+    const y = newLastTurn[1]
+    const r = newLastTurn[2]
+    // X and Y are in reverse for some reason...
+    enemyBoard.value[y][x].status = r == 2 ? 'hit' : 'miss'
+  }
+
+  watch(
+    () => props.lastTurn, handleLastTurnChange
+  );
+
   </script>
   
   <style scoped>

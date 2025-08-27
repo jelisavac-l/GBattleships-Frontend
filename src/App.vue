@@ -5,7 +5,7 @@
       <Home @join-clicked="joinGame" @host-clicked="createGame" />
     </template>
     <template v-else-if="currentPage === 'game'">
-      <Game :board=currentBoard @move="sendMove" :your-turn=yourTurn />
+      <Game :board=currentBoard @move="sendMove" :your-turn=yourTurn :last-turn=lastTurn />
     </template>
     <template v-else-if="currentPage === 'created'">
       <Status :id=currentGameID />
@@ -32,6 +32,8 @@ const gameData = ref(null);
 const error = ref(null);
 const currentBoard = ref(null)
 const yourTurn = ref(false)
+const lastTurn = ref([])
+const tempLastTurn = ref([])
 
 const generateRandomUsername = () => {
   const adjectives = ['Cool', 'Brave', 'Smart', 'Quick', 'Sassy', 'Gentle', 'Funny'];
@@ -161,7 +163,15 @@ const handleWebSocketRequest = (event) => {
         showGame()
         break;
       case 'GetTurnMessage':
+        console.log(event)
         yourTurn.value = true
+        // TODO: Izvuci prosli potes 
+      break;
+      case 'TurnResultMessage':
+        const result = JSON.parse(event.data).payload.hit
+        const resultNumeric = result ? 2 : 3
+        lastTurn.value = [tempLastTurn[0], tempLastTurn[1], resultNumeric]
+        console.log(lastTurn.value)
       break;
       default:
         break;
@@ -205,7 +215,8 @@ const submitBoard = (board) => {
 }
 
 function sendMove({ x, y }) {
-  
+  tempLastTurn[0] = x
+  tempLastTurn[1] = y
   yourTurn.value = false;
   
   // Check if the WebSocket connection is open
