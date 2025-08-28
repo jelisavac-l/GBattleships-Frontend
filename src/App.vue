@@ -228,8 +228,8 @@ function sendMove({ x, y }) {
   const turnMessage = {
     Type: "SendTurnMessage",
     Payload: {
-      x: x,
-      y: y,
+      x: y, // Note: DRZI VODU
+      y: x,
     },
   };
 

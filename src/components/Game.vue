@@ -66,6 +66,7 @@
     const r = newLastTurn[2]
     // X and Y are in reverse for some reason...
     enemyBoard.value[y][x].status = r == 2 ? 'hit' : 'miss'
+    console.log('Response for: ', {x, y})
   }
 
   watch(
