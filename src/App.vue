@@ -5,7 +5,7 @@
       <Home @join-clicked="joinGame" @host-clicked="createGame" />
     </template>
     <template v-else-if="currentPage === 'game'">
-      <Game :board=currentBoard @move="sendMove" :your-turn=yourTurn :last-turn=lastTurn />
+      <Game :board=currentBoard @move="sendMove" :your-turn=yourTurn :last-turn=lastTurn :enemy-turn=lastEnemyTurn />
     </template>
     <template v-else-if="currentPage === 'created'">
       <Status :id=currentGameID />
@@ -18,6 +18,9 @@
     </template>
     <template v-else-if="currentPage === 'defeat'">
       <Status msg="You lost!" />
+    </template>
+    <template v-else-if="currentPage === 'disconnected'">
+      <Status msg="Error: other player closed the connection to the server!" />
     </template>
   </div>
 </template>
@@ -41,6 +44,7 @@ const yourTurn = ref(false)
 const lastTurn = ref([])
 const tempLastTurn = ref([])
 const generatedUsername = ref(null)
+const lastEnemyTurn = ref([-1, -1, -1])
 
 const generateRandomUsername = () => {
   const adjectives = ['Cool', 'Brave', 'Smart', 'Quick', 'Sassy', 'Gentle', 'Funny'];
@@ -173,7 +177,11 @@ const handleWebSocketRequest = (event) => {
       case 'GetTurnMessage':
         console.log(event)
         yourTurn.value = true
-        // TODO: Izvuci prosli potes 
+        const x = JSON.parse(event.data).payload.y
+        const y = JSON.parse(event.data).payload.x
+        const hit = JSON.parse(event.data).payload.hit
+        const hitNumemric = hit ? 2 : 3
+        lastEnemyTurn.value = [x, y, hitNumemric]
       break;
       case 'TurnResultMessage':
         const result = JSON.parse(event.data).payload.hit

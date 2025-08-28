@@ -69,8 +69,21 @@
     console.log('Response for: ', {x, y})
   }
 
+  const handleLastEnemyTurnChange = (newLastEnemyTurn, oldLastEnemyTurn) => {
+    if(newLastEnemyTurn === null || oldLastEnemyTurn === null) return;
+    const x = newLastEnemyTurn[0]
+    const y = newLastEnemyTurn[1]
+    const r = newLastEnemyTurn[2]
+    if(x === -1 || y === -1 || r === -1) return;
+    playerBoard.value[y][x].status = r == 2 ? 'hit' : 'miss'
+  }
+
   watch(
     () => props.lastTurn, handleLastTurnChange
+  );
+
+  watch(
+    () => props.enemyTurn, handleLastEnemyTurnChange
   );
 
   </script>
