@@ -13,6 +13,12 @@
     <template v-else-if="currentPage === 'setup'">
       <BoardCreator @submit-board="submitBoard"/>
     </template>
+    <template v-else-if="currentPage === 'victory'">
+      <Status msg="You won!" />
+    </template>
+    <template v-else-if="currentPage === 'defeat'">
+      <Status msg="You lost!" />
+    </template>
   </div>
 </template>
 
@@ -34,6 +40,7 @@ const currentBoard = ref(null)
 const yourTurn = ref(false)
 const lastTurn = ref([])
 const tempLastTurn = ref([])
+const generatedUsername = ref(null)
 
 const generateRandomUsername = () => {
   const adjectives = ['Cool', 'Brave', 'Smart', 'Quick', 'Sassy', 'Gentle', 'Funny'];
@@ -53,7 +60,7 @@ const createGame = async () => {
   // 1. Generate the random parameters
   const gameId = Math.floor(Math.random() * 100000).toString(); // A random integer for the ID
   const username = generateRandomUsername(); // A random username
-
+  generatedUsername.value = username
   const requestBody = {
     id: gameId,
     username: username
@@ -123,6 +130,7 @@ const joinGame = (gid) => {
 
   const gameId = Math.floor(Math.random() * 100000).toString(); // A random integer for the ID
   const username = generateRandomUsername(); // A random username
+  generatedUsername.value = username
   const requestBody = {
     id: gameId,
     username: username
@@ -173,10 +181,18 @@ const handleWebSocketRequest = (event) => {
         lastTurn.value = [tempLastTurn[0], tempLastTurn[1], resultNumeric]
         console.log(lastTurn.value)
       break;
+      case 'GameResultMessage':
+        const winner = JSON.parse(event.data).payload.winneruname
+        showGameResults(winner === generatedUsername.value)
+      break;
       default:
         break;
     }
 };
+
+const showGameResults = (win) => {
+  currentPage.value = win ? 'victory' : 'defeat'
+}
 
 const submitBoard = (board) => {
 
@@ -249,6 +265,7 @@ const showSetup = () => {
 const showGameCreated = () => {
   currentPage.value = 'created'
 }
+
 
 </script>
 
